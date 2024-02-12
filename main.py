@@ -1,7 +1,7 @@
 from Lexer import Lexer
 
 def main():
-    lexer = Lexer("hola(*)=")
+    lexer = Lexer("/hola(*)'pvto.s'a'")
     lexer.run()
     tokens = lexer.get_tokens()
 
