@@ -1,5 +1,4 @@
 from Token import Token
-
 class Lexer:
     
     KEYWORDS = ("if", "else", "while", "switch", "case", "return", 

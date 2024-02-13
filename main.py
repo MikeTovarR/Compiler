@@ -1,7 +1,11 @@
 from Lexer import Lexer
+from File_Handler import FileHandler
+
 
 def main():
-    lexer = Lexer("/hola(*)'pvto.s'a'")
+
+    file = FileHandler('file.txt')
+    lexer = Lexer(file.read_file())
     lexer.run()
     tokens = lexer.get_tokens()
 
