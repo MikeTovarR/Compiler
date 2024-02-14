@@ -1,16 +1,12 @@
-from Lexer import Lexer
-from File_Handler import FileHandler
+import tkinter
+from TokenGUI import TokenGUI
 
 
 def main():
 
-    file = FileHandler('file.txt')
-    lexer = Lexer(file.read_file())
-    lexer.run()
-    tokens = lexer.get_tokens()
-
-    for token in tokens:
-        print(f"Word: {token.get_word()} Token: {token.get_token()}") 
+    root = tkinter.Tk()
+    TokenGUI(root)
+    root.mainloop()
 
 ################## It works by now, we need to define the "ultimate states" to define the last state of a word
 

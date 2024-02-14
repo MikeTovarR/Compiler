@@ -35,8 +35,3 @@ class TokenGUI:
     def display_tokens(self, tokens):
         for token in tokens:
             self.treeview.insert("", "end", values=(token.get_word(), token.get_token()))
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    token_gui = TokenGUI(root)
-    root.mainloop()
