@@ -28,35 +28,35 @@ class Lexer:
     OTHER = 19
     DELIMITER = 20
 
-    ERROR = -2
-    STOP = 21
+    ERROR = 23
+    STOP = -2
 
     # states table; THIS IS THE TABLE FOR BINARY NUMBERS;
     stateTable = [
-        [1, 4, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 3, 18, 20, STOP, STOP, ERROR, STOP, STOP],
-        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, 5, ERROR, 15, 14, ERROR, 7, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, 17, 17, ERROR, STOP, STOP],
-        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [17, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 18, 18, 18, ERROR, 18, STOP],
-        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, ERROR, ERROR, 21, 21, ERROR, 21, STOP],
-        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 22, ERROR, ERROR, ERROR, ERROR, STOP],
-        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP, STOP],
-        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP]
+        [1, 4, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 3, 18, 20, STOP, STOP, ERROR, STOP],
+        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, 5, ERROR, 15, 14, ERROR, 7, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, 17, 17, ERROR, STOP],
+        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [17, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 18, 18, 18, ERROR, 18],
+        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, ERROR, ERROR, 21, 21, ERROR, 21],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 22, ERROR, ERROR, ERROR, ERROR],
+        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP]
     ]
 
     def __init__(self, text):
@@ -84,39 +84,49 @@ class Lexer:
             current_char = line[index]
             last_state = state
             state = self.calculate_next_state(state, current_char)
-            if not self.is_delimiter(current_char) and not self.is_operator(current_char) and not self.is_space(current_char):
+            #if not self.is_delimiter(current_char) and not self.is_operator(current_char) and not self.is_space(current_char):
+            if state != self.STOP:
                 string += current_char
             index += 1
 
         # review final state
-        # if last_state == 3:
-        #     self.tokens.append(Token(string, "BINARY", row))
-        if last_state == 11:
+        if last_state in (4, 11):
             if self.is_keyword(string):
                 self.tokens.append(Token(string, "KEYWORD", row))
             else: 
                 self.tokens.append(Token(string, "ID", row))
-        elif last_state == 9:
+        elif last_state == 6:
+            self.tokens.append(Token(string, "OCTAL", row))
+        elif last_state in (1, 2, 9):
             self.tokens.append(Token(string, "INTEGER", row))
-        elif last_state == 10:
+        elif last_state in (8, 10, 14, 17):
             self.tokens.append(Token(string, "FLOAT", row))
-        elif self.is_delimiter(current_char):
-            self.tokens.append(Token(current_char, "DELIMITER", row))
-        elif self.is_operator(current_char):
-            self.tokens.append(Token(current_char, "OPERATOR", row))
+        elif last_state == 12:
+            self.tokens.append(Token(string, "BINARY", row))
+        elif last_state == 13:
+            self.tokens.append(Token(string, "HEX", row))
+        elif last_state == 19:
+            self.tokens.append(Token(string, "STRING", row))
+        elif last_state == 22:
+            self.tokens.append(Token(string, "CHAR", row))
         else:
             if string.strip():
                 self.tokens.append(Token(string, "ERROR", row))
-        
-            
 
+        if self.is_delimiter(current_char):
+            self.tokens.append(Token(current_char, "DELIMITER", row))
+        elif self.is_operator(current_char) or current_char in ('+', '-'):
+            self.tokens.append(Token(current_char, "OPERATOR", row))
+        
+
+        print(f"'{string}'")
         # loop
         if index < len(line):
             self.split_line(row, line[index:])
 
     # calculate state
     def calculate_next_state(self, state, current_char):
-        if self.is_delimiter(current_char) or self.is_operator(current_char):
+        if self.is_delimiter(current_char) or self.is_operator(current_char) or self.is_space(current_char):
             return self.stateTable[state][self.DELIMITER]
         elif current_char == '0':
             return self.stateTable[state][self.ZERO]
@@ -158,8 +168,6 @@ class Lexer:
             return self.stateTable[state][self.MINUS]
         elif current_char == '+':
             return self.stateTable[state][self.PLUS]
-        elif self.is_space(current_char):
-            return self.stateTable[state][self.STOP]
         return self.stateTable[state][self.OTHER]
 
     # isDelimiter
@@ -169,7 +177,7 @@ class Lexer:
 
     # isOperator
     def is_operator(self, o):
-        operators = ('*', '/', '<', '>', '=', '!', '&', '|')
+        operators = ('*', '/', '<', '>', '=', '!', '&', '|', '%')
         return o in operators
 
     """# isQuotationMark
