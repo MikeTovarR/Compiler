@@ -1,1 +1,2 @@
-"hola"soy"mike"
+"hola";
+'a'b'c'

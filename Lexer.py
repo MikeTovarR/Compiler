@@ -87,7 +87,7 @@ class Lexer:
             #if not self.is_delimiter(current_char) and not self.is_operator(current_char) and not self.is_space(current_char):
             if state != self.STOP:
                 string += current_char
-            index += 1
+                index += 1
 
         # review final state
         if last_state in (4, 11):
@@ -105,19 +105,19 @@ class Lexer:
             self.tokens.append(Token(string, "BINARY", row))
         elif last_state == 13:
             self.tokens.append(Token(string, "HEX", row))
-        elif last_state == 19:
+        elif last_state in (18, 19):
             self.tokens.append(Token(string, "STRING", row))
-        elif last_state == 22:
+        elif last_state in (21, 22):
             self.tokens.append(Token(string, "CHAR", row))
-        else:
-            if string.strip():
-                self.tokens.append(Token(string, "ERROR", row))
-
-        if self.is_delimiter(current_char):
+        elif self.is_delimiter(current_char):
             self.tokens.append(Token(current_char, "DELIMITER", row))
+            index += 1
         elif self.is_operator(current_char) or current_char in ('+', '-'):
             self.tokens.append(Token(current_char, "OPERATOR", row))
-        
+            index += 1
+        else:
+            if string.strip():
+                self.tokens.append(Token(string, "ERROR", row))        
 
         print(f"'{string}'")
         # loop
