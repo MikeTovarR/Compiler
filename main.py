@@ -3,7 +3,7 @@ from TokenGUI import TokenGUI
 
 def main():
 
-    file_location = "file2.txt" 
+    file_location = "prueba_profe.txt" 
     root = tkinter.Tk()
     TokenGUI(root, file_location)
     root.mainloop()

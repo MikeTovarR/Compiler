@@ -29,12 +29,12 @@ class Lexer:
     OTHER = 20
     DELIMITER = 21
 
-    ERROR = 23
+    ERROR = 24
     STOP = -2
 
     # states table; THIS IS THE TABLE FOR BINARY NUMBERS;
     stateTable = [
-        [1, 4, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 3, 18, 20, STOP, STOP, ERROR, ERROR, STOP],
+        [1, 4, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 3, 18, 21, STOP, STOP, ERROR, ERROR, STOP],
         [6, ERROR, ERROR, 6, 6, ERROR, ERROR, 5, ERROR, 15, 14, ERROR, 7, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
         [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
         [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
@@ -52,10 +52,11 @@ class Lexer:
         [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, 17, 17, ERROR, ERROR, STOP],
         [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
         [17, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
-        [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 18, 18, 18, 18, ERROR, 18],
-        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
-        [21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, ERROR, ERROR, 21, 21, 21, ERROR, 21],
-        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 22, ERROR, ERROR, ERROR, ERROR, ERROR],
+        [19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, ERROR, ERROR, 19, 19, 19, ERROR, 19],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 20, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR],
+        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, ERROR, ERROR, 22, 22, 22, ERROR, 22],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 23, ERROR, ERROR, ERROR, ERROR, ERROR],
         [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
         [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP]
     ]
@@ -85,32 +86,32 @@ class Lexer:
             current_char = line[index]
             last_state = state
             state = self.calculate_next_state(state, current_char)
-            #if not self.is_delimiter(current_char) and not self.is_operator(current_char) and not self.is_space(current_char):
             if state != self.STOP:
                 string += current_char
                 index += 1
+        if state == -2: state = last_state
 
         # review final state
-        if last_state in (4, 11):
+        if state in (4, 11):
             if self.is_keyword(string):
                 self.tokens.append(Token(string, "KEYWORD", row))
             else: 
                 self.tokens.append(Token(string, "ID", row))
-        elif last_state == 6:
+        elif state == 6:
             self.tokens.append(Token(string, "OCTAL", row))
-        elif last_state in (1, 2, 9):
+        elif state in (1, 2, 9):
             self.tokens.append(Token(string, "INTEGER", row))
-        elif last_state in (8, 10, 14, 17):
+        elif state in (8, 10, 14, 17):
             self.tokens.append(Token(string, "FLOAT", row))
-        elif last_state == 12:
+        elif state == 12:
             self.tokens.append(Token(string, "BINARY", row))
-        elif last_state == 13:
+        elif state == 13:
             self.tokens.append(Token(string, "HEX", row))
-        elif last_state in (18, 19):
+        elif state == 20:
             self.tokens.append(Token(string, "STRING", row))
-        elif last_state in (21, 22):
+        elif state == 23:
             self.tokens.append(Token(string, "CHAR", row))
-        elif last_state == 23:
+        elif state in (18, 19, 21, 22, 24):
             self.tokens.append(Token(string, "ERROR", row))
         elif self.is_delimiter(current_char):
             self.tokens.append(Token(current_char, "DELIMITER", row))
