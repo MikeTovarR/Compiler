@@ -1,2 +1,1 @@
-"hola";
-'a'b'c'
+float y = "hello;

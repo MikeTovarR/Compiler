@@ -5,7 +5,9 @@ from File_Handler import FileHandler
 from Lexer import Lexer
 
 class TokenGUI:
-    def __init__(self, root):
+    def __init__(self, root, file_location):
+        self.file_location = file_location
+
         self.root = root
         self.root.title("Token Analyzer")
 
@@ -21,8 +23,7 @@ class TokenGUI:
         self.button_analyze.grid(row=2, column=0, padx=5, pady=5)
 
     def analyze_file(self):
-        file_location = "file.txt"  # Ruta de tu archivo de texto
-        file_handler = FileHandler(file_location)
+        file_handler = FileHandler(self.file_location)
         text = file_handler.read_file()
         if text is not None:
             lexer = Lexer(text)

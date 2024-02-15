@@ -25,38 +25,39 @@ class Lexer:
     QM = 16
     MINUS = 17
     PLUS = 18
-    OTHER = 19
-    DELIMITER = 20
+    AT = 19
+    OTHER = 20
+    DELIMITER = 21
 
     ERROR = 23
     STOP = -2
 
     # states table; THIS IS THE TABLE FOR BINARY NUMBERS;
     stateTable = [
-        [1, 4, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 3, 18, 20, STOP, STOP, ERROR, STOP],
-        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, 5, ERROR, 15, 14, ERROR, 7, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, 17, 17, ERROR, STOP],
-        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [17, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 18, 18, 18, ERROR, 18],
-        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, ERROR, ERROR, 21, 21, ERROR, 21],
-        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 22, ERROR, ERROR, ERROR, ERROR],
-        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
-        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, STOP]
+        [1, 4, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 3, 18, 20, STOP, STOP, ERROR, ERROR, STOP],
+        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, 5, ERROR, 15, 14, ERROR, 7, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [6, ERROR, ERROR, 6, 6, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [9, ERROR, ERROR, 9, 9, 9, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, 8, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [10, ERROR, ERROR, 10, 10, 10, ERROR, ERROR, ERROR, 15, 14, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [12, ERROR, ERROR, 12, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [13, ERROR, ERROR, 13, 13, 13, 13, 13, 13, 13, 13, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, 17, 17, ERROR, ERROR, STOP],
+        [ERROR, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [17, ERROR, ERROR, 17, 17, 17, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 18, 18, 18, 18, ERROR, 18],
+        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP],
+        [21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, ERROR, ERROR, 21, 21, 21, ERROR, 21],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, 22, ERROR, ERROR, ERROR, ERROR, ERROR],
+        [STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, STOP, ERROR, STOP],
+        [ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, ERROR, STOP, STOP, STOP, STOP, ERROR, ERROR, STOP]
     ]
 
     def __init__(self, text):
@@ -109,8 +110,12 @@ class Lexer:
             self.tokens.append(Token(string, "STRING", row))
         elif last_state in (21, 22):
             self.tokens.append(Token(string, "CHAR", row))
+        elif last_state == 23:
+            self.tokens.append(Token(string, "ERROR", row))
         elif self.is_delimiter(current_char):
             self.tokens.append(Token(current_char, "DELIMITER", row))
+            index += 1
+        elif self.is_space(current_char):
             index += 1
         elif self.is_operator(current_char) or current_char in ('+', '-'):
             self.tokens.append(Token(current_char, "OPERATOR", row))
@@ -119,7 +124,6 @@ class Lexer:
             if string.strip():
                 self.tokens.append(Token(string, "ERROR", row))        
 
-        print(f"'{string}'")
         # loop
         if index < len(line):
             self.split_line(row, line[index:])
@@ -168,6 +172,8 @@ class Lexer:
             return self.stateTable[state][self.MINUS]
         elif current_char == '+':
             return self.stateTable[state][self.PLUS]
+        elif current_char == '@':
+            return self.stateTable[state][self.AT]
         return self.stateTable[state][self.OTHER]
 
     # isDelimiter
@@ -179,11 +185,6 @@ class Lexer:
     def is_operator(self, o):
         operators = ('*', '/', '<', '>', '=', '!', '&', '|', '%')
         return o in operators
-
-    """# isQuotationMark
-    def is_quotation_mark(self, o):
-        quote = ['"', "'"]
-        return o in quote"""
 
     # isSpace
     def is_space(self, o):
