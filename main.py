@@ -1,11 +1,11 @@
 import tkinter
 from TokenGUI import TokenGUI
 
-
 def main():
 
+    file_location = "file2.txt" 
     root = tkinter.Tk()
-    TokenGUI(root)
+    TokenGUI(root, file_location)
     root.mainloop()
 
 ################## It works by now, we need to define the "ultimate states" to define the last state of a word
