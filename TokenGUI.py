@@ -32,9 +32,9 @@ class TokenGUI:
         self.console.grid(row=1, columnspan=2, padx=5, pady=5, sticky="nsew")
 
     def analyze_file(self):
-        file_handler = FileHandler(self.file_location)
-        text = file_handler.read_file()
-        #text = self.editor.get("1.0", tk.END)
+        # file_handler = FileHandler(self.file_location) ## uncomment this lines and comment the line below to activate the editor
+        # text = file_handler.read_file()
+        text = self.editor.get("1.0", tk.END) ## comment this line and uncomment the 2 lines above to activate the file reader
         if text is not None:
             lexer = Lexer(text)
             lexer.run()
