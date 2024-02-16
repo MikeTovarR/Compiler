@@ -32,9 +32,9 @@ class TokenGUI:
         self.console.grid(row=1, columnspan=2, padx=5, pady=5, sticky="nsew")
 
     def analyze_file(self):
-        # file_handler = FileHandler(self.file_location)
-        # text = file_handler.read_file()
-        text = self.editor.get("1.0", tk.END)
+        file_handler = FileHandler(self.file_location)
+        text = file_handler.read_file()
+        #text = self.editor.get("1.0", tk.END)
         if text is not None:
             lexer = Lexer(text)
             lexer.run()
@@ -50,11 +50,12 @@ class TokenGUI:
         self.console.delete("1.0", tk.END)
         for item in self.treeview.get_children():
             self.treeview.delete(item)
+
         for token in tokens:
             self.treeview.insert("", "end", values=(token.get_word(), token.get_token(), token.get_line()))
-            if token.get_token() not in unique_tokens:
-                unique_tokens.append(token.get_token())
-                tokens_lines.append( token.get_line())
+            
+            unique_tokens.append(token.get_token())
+            tokens_lines.append( token.get_line())
 
         for token, line in zip(unique_tokens, tokens_lines):
             if token in frequency:
@@ -65,5 +66,10 @@ class TokenGUI:
                 frequency[token] = {line: 1}
 
         for token, lines in frequency.items():
+            no_lines = 0
+            total_count = 0
             for line, count in lines.items():
-                self.console.insert("end", f"{count} {token}s found in {line} lines\n") #dont print well, try with lines first
+                no_lines += 1
+                total_count += count
+            self.console.insert("end", f"{total_count} {token}s found in {no_lines} lines\n") #dont print well, try with lines first
+                
