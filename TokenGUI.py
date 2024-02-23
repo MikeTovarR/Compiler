@@ -4,6 +4,7 @@ from tkinter import messagebox
 from tkinter import scrolledtext
 from File_Handler import FileHandler
 from Lexer import Lexer
+from UParser import UParser
 
 class TokenGUI:
     def __init__(self, root, file_location):
@@ -39,6 +40,7 @@ class TokenGUI:
             lexer = Lexer(text)
             lexer.run()
             tokens = lexer.get_tokens()
+            parser = UParser(tokens) # Incluí el parser aquí
             self.display_tokens(tokens)
         else:
             messagebox.showerror("File Not Found", f"File {self.file_location} not found.")
