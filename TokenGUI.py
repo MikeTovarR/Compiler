@@ -37,10 +37,13 @@ class TokenGUI:
         # text = file_handler.read_file()
         text = self.editor.get("1.0", tk.END) ## comment this line and uncomment the 2 lines above to activate the file reader
         if text is not None:
+            # LEXER
             lexer = Lexer(text)
             lexer.run()
             tokens = lexer.get_tokens()
+            # PARSER
             parser = UParser(tokens) # Incluí el parser aquí
+            parser.RULE_PROGRAM()
             self.display_tokens(tokens)
         else:
             messagebox.showerror("File Not Found", f"File {self.file_location} not found.")
