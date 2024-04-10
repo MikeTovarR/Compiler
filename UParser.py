@@ -58,6 +58,12 @@ class UParser:
                 else: self.exitParser(3, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
             else: self.exitParser(4, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
+            """
+            if self.currentToken >= len(self.tokens): 
+                self.currentToken -= 1
+                break
+            """
+
     def RULE_ASSIGMENT(self):
         self.currentToken += 1
 
