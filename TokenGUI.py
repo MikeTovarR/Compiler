@@ -41,10 +41,10 @@ class TokenGUI:
             lexer = Lexer(text)
             lexer.run()
             tokens = lexer.get_tokens()
+            self.display_tokens(tokens)
             # PARSER
             parser = UParser(tokens) # Incluí el parser aquí
             parser.RULE_PROGRAM()
-            self.display_tokens(tokens)
         else:
             messagebox.showerror("File Not Found", f"File {self.file_location} not found.")
 
