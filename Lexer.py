@@ -3,7 +3,7 @@ class Lexer:
     
     KEYWORDS = ("if", "else", "while", "switch", "case", "return", 
                 "int", "float", "void", "char", "string", "boolean", 
-                "true", "false", "print")
+                "true", "false", "print", "do", "for", "switch", "case", "function", "read")
     
     # Constants
     ZERO = 0

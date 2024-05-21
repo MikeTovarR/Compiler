@@ -8,13 +8,14 @@ class UParser:
         self.FOLLOW = dict()
         self.buildFandF()
 
+    # Incompleta
     def buildFandF(self):
-        self.FIRST["PROGRAM"] = {"{"}
+        self.FIRST["PROCESS"] = {"{"}
         self.FIRST["PRINT"] = {"print"}
         self.FIRST["ASSIGMENT"] = {"ID"}
         self.FIRST["VARIABLE"] = {"int", "float", "bool", "void", "char", "string"}
         self.FIRST["RETURN"] = {"return"}
-        self.FIRST["WHILE"] = {"while"},
+        self.FIRST["WHILE"] = {"while"}
         self.FIRST["IF"] = {"if"}
         self.FIRST["RETURN"] = {"return"}
         self.FIRST["BODY"] = self.FIRST["PRINT"].union(self.FIRST["ASSIGMENT"].union(self.FIRST["VARIABLE"].union(self.FIRST["WHILE"].union(self.FIRST["IF"].union(self.FIRST["RETURN"])))))
@@ -27,11 +28,11 @@ class UParser:
         self.FIRST["X"] = self.FIRST["Y"]
         self.FIRST["EXPRESSION"] = self.FIRST["X"]
 
-        self.FOLLOW["PROGRAM"] = {"EOF"}
+        self.FOLLOW["PROCESS"] = {"EOF"}
         self.FOLLOW["PRINT"] = {";"}
         self.FOLLOW["ASSIGMENT"] = {";"}
         self.FOLLOW["VARIABLE"] = {";"}
-        self.FOLLOW["RETURN"] = {";"}]
+        self.FOLLOW["RETURN"] = {";"}
         self.FOLLOW["BODY"] = {";"}
         self.FOLLOW["WHILE"] = {"}"}.union(self.FIRST["BODY"])
         self.FOLLOW["IF"] = {"}"}.union(self.FIRST["BODY"])
@@ -68,10 +69,19 @@ class UParser:
         elif error == 10: 
             print("Line  "+str(line)+": invalid \""+str(word)+"\" expected VALUE, IDENTIFIER or (")
             isIncremented = True
+        elif error == 11: 
+            print("Line  "+str(line)+": invalid \""+str(word)+"\" expected IDENTIFIER")
+            isIncremented = True
 
         if isIncremented: self.incrementToken()
 
     def RULE_PROGRAM(self):
+        if self.tokens[self.currentToken].get_word() == "int" or self.tokens[self.currentToken].get_word() == "float" or self.tokens[self.currentToken].get_word() == "bool" or self.tokens[self.currentToken].get_word() == "char" or self.tokens[self.currentToken].get_word() == "string" or self.tokens[self.currentToken].get_word() == "void":
+            self.RULE_VARIABLE()
+            if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
+            else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+    def RULE_PROCESS(self):
         if self.tokens[self.currentToken].get_word() == "{": self.incrementToken()
         else: self.exitParser(1, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
@@ -96,10 +106,22 @@ class UParser:
                 else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
             elif self.tokens[self.currentToken].get_word() == "while":
                 self.RULE_WHILE()
+            elif self.tokens[self.currentToken].get_word() == "do":
+                self.RULE_DOWHILE()
+                if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
+                else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+            elif self.tokens[self.currentToken].get_word() == "for":
+                self.RULE_FOR()
+            elif self.tokens[self.currentToken].get_word() == "switch":
+                self.RULE_SWITCH()
             elif self.tokens[self.currentToken].get_word() == "if":
                 self.RULE_IF()
             elif self.tokens[self.currentToken].get_word() == "print":
                 self.RULE_PRINT()
+                if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
+                else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+            elif self.tokens[self.currentToken].get_word() == "read":
+                self.RULE_READ()
                 if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
                 else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
             elif self.tokens[self.currentToken].get_word() == "return":
@@ -125,11 +147,32 @@ class UParser:
         while not (self.tokens[self.currentToken].get_word() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_token() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_word() in self.FOLLOW["EXPRESSION"]):
                 self.incrementToken()        
 
-    def RULE_VARIABLE(self):
+    # Incompleta
+    def RULE_FUNCTION(self):
         self.incrementToken()
     
         if self.tokens[self.currentToken].get_token() == "ID": self.incrementToken()
         else: self.exitParser(6, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        if self.tokens[self.currentToken].get_word() == "(": self.incrementToken()
+        else: self.exitParser(7, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["PARAMS"] or self.tokens[self.currentToken].get_token() in self.FIRST["PARAMS"] or self.tokens[self.currentToken].get_word() == ")"):
+            self.incrementToken() 
+
+        self.RULE_EXPRESSION()
+
+        if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
+        else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+    def RULE_VARIABLE(self):
+        self.incrementToken()
+    
+        if self.tokens[self.currentToken].get_token() != "ID": self.exitParser(6, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        if self.tokens[self.currentToken].get_word() == "=": 
+            self.RULE_ASSIGMENT()
+        else: self.incrementToken()
             
     def RULE_WHILE(self):
         self.incrementToken()
@@ -145,10 +188,65 @@ class UParser:
         if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
         else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
 
-        while not (self.tokens[self.currentToken].get_word() in self.FIRST["PROGRAM"] or self.tokens[self.currentToken].get_token() in self.FIRST["PROGRAM"] or self.tokens[self.currentToken].get_word() in self.FOLLOW["PROGRAM"] or self.tokens[self.currentToken].get_token() in self.FOLOW["PROGRAM"]):
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["PROCESS"] or self.tokens[self.currentToken].get_token() in self.FIRST["PROCESS"] or self.tokens[self.currentToken].get_word() in self.FOLLOW["PROCESS"] or self.tokens[self.currentToken].get_token() in self.FOLOW["PROCESS"]):
             self.incrementToken() 
 
-        self.RULE_PROGRAM()
+        self.RULE_PROCESS()
+
+    def RULE_DOWHILE(self):
+        self.incrementToken()
+
+        self.RULE_PROCESS()
+
+        if self.tokens[self.currentToken].get_word() == "(": self.incrementToken()
+        else: self.exitParser(7, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_token() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_word() == ")"):
+            self.incrementToken() 
+
+        self.RULE_EXPRESSION()
+
+        if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
+        else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+    
+    # Incompleta
+    def RULE_SWITCH(self):
+        self.incrementToken()
+        #Por implementar
+
+    def RULE_FOR(self):
+        self.incrementToken()
+
+        if self.tokens[self.currentToken].get_word() == "(": self.incrementToken()
+        else: self.exitParser(7, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["PARAMS"] or self.tokens[self.currentToken].get_token() in self.FIRST["PARAMS"] or self.tokens[self.currentToken].get_word() == ")"):
+            self.incrementToken() 
+
+        self.RULE_PARAMS_FOR()
+
+        if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
+        else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+    
+    def RULE_PARAMS_FOR(self):
+        if self.tokens[self.currentToken].get_word() == "int" or self.tokens[self.currentToken].get_word() == "float" or self.tokens[self.currentToken].get_word() == "bool" or self.tokens[self.currentToken].get_word() == "char" or self.tokens[self.currentToken].get_word() == "string" or self.tokens[self.currentToken].get_word() == "void":
+            self.RULE_VARIABLE()
+            if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
+            else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+        else: self.exitParser(4, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_token() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_word() == ")"):
+            self.incrementToken() 
+
+        self.RULE_EXPRESSION()
+
+        if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
+        else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["E"] or self.tokens[self.currentToken].get_token() in self.FIRST["E"] or self.tokens[self.currentToken].get_word() == ")"):
+            self.incrementToken() 
+
+        self.RULE_E()
 
     def RULE_IF(self):
         self.incrementToken()
@@ -164,14 +262,14 @@ class UParser:
         if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
         else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
 
-        while not (self.tokens[self.currentToken].get_word() in self.FIRST["PROGRAM"] or self.tokens[self.currentToken].get_token() in self.FIRST["PROGRAM"] or self.tokens[self.currentToken].get_word() in self.FOLLOW["PROGRAM"] or self.tokens[self.currentToken].get_token() in self.FOLOW["PROGRAM"]):
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["PROCESS"] or self.tokens[self.currentToken].get_token() in self.FIRST["PROCESS"] or self.tokens[self.currentToken].get_word() in self.FOLLOW["PROCESS"] or self.tokens[self.currentToken].get_token() in self.FOLOW["PROCESS"]):
             self.incrementToken() 
 
-        self.RULE_PROGRAM()
+        self.RULE_PROCESS()
 
         if self.tokens[self.currentToken].get_word() == "else": 
             self.incrementToken()
-            self.RULE_PROGRAM()
+            self.RULE_PROCESS()
 
     def RULE_RETURN(self):
         self.incrementToken()
@@ -183,6 +281,22 @@ class UParser:
             self.incrementToken()
 
             self.RULE_EXPRESSION()
+
+            if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
+            else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+        else: self.exitParser(7, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+        while not (self.tokens[self.currentToken].get_word() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_token() in self.FIRST["EXPRESSION"] or self.tokens[self.currentToken].get_word() == ")"):
+            self.incrementToken() 
+
+    def RULE_READ(self):
+        self.incrementToken()
+
+        if self.tokens[self.currentToken].get_word() == "(": 
+            self.incrementToken()
+
+            if self.tokens[self.currentToken].get_token() == "ID": self.incrementToken()
+            else: self.exitParser(11, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
 
             if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
             else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
