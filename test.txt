@@ -1,2 +1,5 @@
 {
-hello
+int x
+int
+int int x;
+}
