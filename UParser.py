@@ -1,8 +1,10 @@
 from Token import Token
+
 class UParser:
     def __init__(self, tokens):
         self.currentToken = 0
         self.tokens = tokens
+        self.syntax_tree = {}
 
     def exitParser(self, error, line, word):
         isIncremented = False
@@ -25,169 +27,127 @@ class UParser:
         if isIncremented: self.currentToken += 1
 
     def RULE_PROGRAM(self):
+        self.syntax_tree = {"PROGRAM": {}}
         if self.tokens[self.currentToken].get_word() == "{": self.currentToken += 1
         else: self.exitParser(1, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        self.RULE_BODY()
+        self.RULE_BODY(self.syntax_tree["PROGRAM"])
 
         if self.tokens[self.currentToken].get_word() == "}": self.currentToken += 1
         else: self.exitParser(2, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-    def RULE_BODY(self):
+    def RULE_BODY(self, parent):
         while self.tokens[self.currentToken].get_word() != "}": 
             if self.tokens[self.currentToken].get_token() == "ID":
-                self.RULE_ASSIGMENT()
+                assignment = {}
+                self.RULE_ASSIGMENT(assignment)
+                parent["ASSIGNMENT"] = assignment
                 if self.tokens[self.currentToken].get_word() == ";": self.currentToken += 1
                 else: self.exitParser(3, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-            #Incluir todos los tipos de variable
             elif self.tokens[self.currentToken].get_word() == "int":
-                self.RULE_VARIABLE()
+                variable = {}
+                self.RULE_VARIABLE(variable)
+                parent["VARIABLE"] = variable
                 if self.tokens[self.currentToken].get_word() == ";": self.currentToken += 1
                 else: self.exitParser(3, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
             elif self.tokens[self.currentToken].get_word() == "while":
-                self.RULE_WHILE()
+                while_block = {}
+                self.RULE_WHILE(while_block)
+                parent["WHILE"] = while_block
             elif self.tokens[self.currentToken].get_word() == "if":
-                self.RULE_IF()
+                if_block = {}
+                self.RULE_IF(if_block)
+                parent["IF"] = if_block
             elif self.tokens[self.currentToken].get_word() == "print":
-                self.RULE_PRINT()
+                print_block = {}
+                self.RULE_PRINT(print_block)
+                parent["PRINT"] = print_block
                 if self.tokens[self.currentToken].get_word() == ";": self.currentToken += 1
                 else: self.exitParser(3, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
             elif self.tokens[self.currentToken].get_word() == "return":
-                self.RULE_RETURN()
+                return_block = {}
+                self.RULE_RETURN(return_block)
+                parent["RETURN"] = return_block
                 if self.tokens[self.currentToken].get_word() == ";": self.currentToken += 1
                 else: self.exitParser(3, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
             else: self.exitParser(4, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-            """
-            if self.currentToken >= len(self.tokens): 
-                self.currentToken -= 1
-                break
-            """
-
-    def RULE_ASSIGMENT(self):
+    def RULE_ASSIGMENT(self, parent):
+        parent["ID"] = self.tokens[self.currentToken].get_word()
         self.currentToken += 1
 
-        if self.tokens[self.currentToken].get_word() == "=": self.currentToken += 1  
+        if self.tokens[self.currentToken].get_word() == "=": self.currentToken += 1
         else: self.exitParser(5, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        self.RULE_EXPRESSION()
-
-    def RULE_VARIABLE(self):
+        parent["EXPRESSION"] = self.tokens[self.currentToken].get_word()
         self.currentToken += 1
 
-        if self.tokens[self.currentToken].get_token() == "ID": self.currentToken += 1
+    def RULE_VARIABLE(self, parent):
+        parent["TYPE"] = self.tokens[self.currentToken].get_word()
+        self.currentToken += 1
+
+        if self.tokens[self.currentToken].get_token() == "ID":
+            parent["ID"] = self.tokens[self.currentToken].get_word()
+            self.currentToken += 1
         else: self.exitParser(6, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-            
-    def RULE_WHILE(self):
+
+        if self.tokens[self.currentToken].get_word() == "=":
+            self.currentToken += 1
+            parent["EXPRESSION"] = self.tokens[self.currentToken].get_word()
+            self.currentToken += 1
+
+    def RULE_WHILE(self, parent):
+        parent["WHILE"] = self.tokens[self.currentToken].get_word()
         self.currentToken += 1
 
         if self.tokens[self.currentToken].get_word() == "(": self.currentToken += 1
         else: self.exitParser(7, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        self.RULE_EXPRESSION()
+        parent["CONDITION"] = self.tokens[self.currentToken].get_word()
+        self.currentToken += 1
 
         if self.tokens[self.currentToken].get_word() == ")": self.currentToken += 1
         else: self.exitParser(8, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        self.RULE_PROGRAM()
+        if self.tokens[self.currentToken].get_word() == "{": self.currentToken += 1
+        else: self.exitParser(1, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-    def RULE_IF(self):
+        self.RULE_BODY(parent)
+
+        if self.tokens[self.currentToken].get_word() == "}": self.currentToken += 1
+        else: self.exitParser(2, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+
+    def RULE_IF(self, parent):
+        parent["IF"] = self.tokens[self.currentToken].get_word()
         self.currentToken += 1
 
         if self.tokens[self.currentToken].get_word() == "(": self.currentToken += 1
         else: self.exitParser(7, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        self.RULE_EXPRESSION()
+        parent["CONDITION"] = self.tokens[self.currentToken].get_word()
+        self.currentToken += 1
 
         if self.tokens[self.currentToken].get_word() == ")": self.currentToken += 1
         else: self.exitParser(8, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        self.RULE_PROGRAM()
+        if self.tokens[self.currentToken].get_word() == "{": self.currentToken += 1
+        else: self.exitParser(1, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
 
-        if self.tokens[self.currentToken].get_word() == "else": 
-            self.currentToken += 1
-            self.RULE_PROGRAM()
+        self.RULE_BODY(parent)
 
-    def RULE_RETURN(self):
+        if self.tokens[self.currentToken].get_word() == "}": self.currentToken += 1
+        else: self.exitParser(2, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+
+    def RULE_PRINT(self, parent):
+        parent["PRINT"] = self.tokens[self.currentToken].get_word()
         self.currentToken += 1
 
-    def RULE_PRINT(self):
+        parent["EXPRESSION"] = self.tokens[self.currentToken].get_word()
         self.currentToken += 1
 
-        if self.tokens[self.currentToken].get_word() == "(": self.currentToken += 1
-        else: self.exitParser(7, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+    def RULE_RETURN(self, parent):
+        parent["RETURN"] = self.tokens[self.currentToken].get_word()
+        self.currentToken += 1
 
-        self.RULE_EXPRESSION()
-
-        if self.tokens[self.currentToken].get_word() == ")": self.currentToken += 1
-        else: self.exitParser(8, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-
-    def RULE_EXPRESSION(self):
-        self.RULE_X()
-
-        while self.tokens[self.currentToken].get_word() == "|": 
-            self.currentToken += 1
-            self.RULE_X()
-
-    def RULE_X(self):
-        self.RULE_Y()
-
-        while self.tokens[self.currentToken].get_word() == "&": 
-            self.currentToken += 1
-            self.RULE_Y()
-
-    def RULE_Y(self):
-        if self.tokens[self.currentToken].get_word() == "!": 
-            if self.tokens[self.currentToken+1].get_word() == "=": 
-                self.currentToken += 2
-                self.RULE_E()
-            else: 
-                self.currentToken += 1
-                self.RULE_R()
-        else: self.RULE_R()
-
-    def RULE_R(self):
-        self.RULE_E()
-
-        while self.tokens[self.currentToken].get_word() == "<" or self.tokens[self.currentToken].get_word() == ">" or self.tokens[self.currentToken].get_word() == "=":
-            if self.tokens[self.currentToken+1].get_word() == "=":  self.currentToken += 2
-            elif self.tokens[self.currentToken].get_word() == "=":  self.exitParser(9, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-            else: self.currentToken += 1
-
-            self.RULE_E()
-
-    def RULE_E(self):
-        self.RULE_A()
-
-        if self.tokens[self.currentToken].get_word() == "-" or self.tokens[self.currentToken].get_word() == "+": 
-            self.currentToken += 1
-            self.RULE_A()
-
-    def RULE_A(self):
-        self.RULE_B()
-
-        if self.tokens[self.currentToken].get_word() == "/" or self.tokens[self.currentToken].get_word() == "*": 
-            self.currentToken += 1
-            self.RULE_B()
-
-    def RULE_B(self):
-        if self.tokens[self.currentToken].get_word() == "-": self.currentToken += 1
-
-        self.RULE_C()
-
-    def RULE_C(self):
-        if self.tokens[self.currentToken].get_token() in {"INTEGER", "OCTAL", "HEX", "BINARY", "STRING", "CHAR", "FLOAT", "ID"}:
-            self.currentToken += 1
-        if self.tokens[self.currentToken].get_word() in {"true", "false"}:
-            self.currentToken += 1
-        elif self.tokens[self.currentToken].get_word() == "(": 
-            self.currentToken += 1
-            self.RULE_EXPRESSION()
-
-            if self.tokens[self.currentToken].get_word() == ")": self.currentToken += 1
-            else: self.exitParser(8, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-        else: self.exitParser(10, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-
-
-
-
+        parent["EXPRESSION"] = self.tokens[self.currentToken].get_word()
+        self.currentToken += 1
