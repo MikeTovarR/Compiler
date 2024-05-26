@@ -1,4 +1,5 @@
 from Token import Token
+from SemanticAnalyzer import SematicAnalyzer
 
 class UParser:
     def __init__(self, tokens):
@@ -168,7 +169,11 @@ class UParser:
     def RULE_VARIABLE(self):
         self.incrementToken()
     
-        if self.tokens[self.currentToken].get_token() != "ID": self.exitParser(6, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+        if self.tokens[self.currentToken].get_token() == "ID": 
+            SematicAnalyzer.CheckVariable(self.tokens[self.currentToken-1].get_word(), self.tokens[self.currentToken].get_word())
+            self.incrementToken()
+        else:
+            self.exitParser(6, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
 
         if self.tokens[self.currentToken].get_word() == "=": 
             self.RULE_ASSIGMENT()
