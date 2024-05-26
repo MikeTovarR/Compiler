@@ -474,48 +474,216 @@ class UParser:
             CodeGenerator.addInstruction("OPR", "10", "0")
 
     def RULE_R(self):
+        # Semantic
+        operator = ""
+
         self.RULE_E()
 
-        while self.tokens[self.currentToken].get_word() == "<" or self.tokens[self.currentToken].get_word() == ">" or self.tokens[self.currentToken].get_word() == "=":
-            if self.tokens[self.currentToken+1].get_word() == "=":  
-                self.incrementToken()
-                self.incrementToken()
-            elif self.tokens[self.currentToken].get_word() == "=":  self.exitParser(9, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
-            else: self.incrementToken()
+        while self.isSameLine() and (self.tokens[self.currentToken].get_word() == "<" or self.tokens[self.currentToken].get_word() == ">" or self.tokens[self.currentToken].get_word() == "==" or self.tokens[self.currentToken].get_word() == "!="):
+            if self.tokens[self.currentToken+1].get_word() == ">":
+                operator = ">"
+            elif self.tokens[self.currentToken+1].get_word() == "<":
+                operator = "<"
+            elif self.tokens[self.currentToken+1].get_word() == "==":
+                operator = "=="
+            elif self.tokens[self.currentToken+1].get_word() == "!=":
+                operator = "!="
+
+            self.incrementToken()
 
             self.RULE_E()
 
+            # Semantic
+            x = SemanticAnalyzer.popStack()
+            y = SemanticAnalyzer.popStack()
+            result = SemanticAnalyzer.calculate_cube(x, y, operator)
+            SemanticAnalyzer.pushStack(result)
+
+            # Code Generation
+            if operator == ">": CodeGenerator.addInstruction("OPR", "11", "0")
+            elif operator == "<": CodeGenerator.addInstruction("OPR", "12", "0")
+            elif operator == "==": CodeGenerator.addInstruction("OPR", "15", "0")
+            else: CodeGenerator.addInstruction("OPR", "16", "0")
+
     def RULE_E(self):
+        # Semantic
+        operator = ""
+
         self.RULE_A()
 
-        if self.tokens[self.currentToken].get_word() == "-" or self.tokens[self.currentToken].get_word() == "+": 
+        while self.isSameLine() and (self.tokens[self.currentToken].get_word() == "-" or self.tokens[self.currentToken].get_word() == "+"): 
+            if self.tokens[self.currentToken].get_word() == "+":
+                operator = "+"
+            elif self.tokens[self.currentToken].get_word() == "-":
+                operator = "-"
+
             self.incrementToken()
+
             self.RULE_A()
 
+            # Semantic
+            x = SemanticAnalyzer.popStack()
+            y = SemanticAnalyzer.popStack()
+            result = SemanticAnalyzer.calculate_cube(x, y, operator)
+            SemanticAnalyzer.pushStack(result)
+
+            # Code Generation
+            if operator == "+": CodeGenerator.addInstruction("OPR", "2", "0")
+            else: CodeGenerator.addInstruction("OPR", "3", "0")
+
     def RULE_A(self):
+        # Semantic
+        operator = ""
+
         self.RULE_B()
 
-        if self.tokens[self.currentToken].get_word() == "/" or self.tokens[self.currentToken].get_word() == "*": 
+        while self.isSameLine() and (self.tokens[self.currentToken].get_word() == "*" or self.tokens[self.currentToken].get_word() == "/"): 
+            if self.tokens[self.currentToken].get_word() == "*":
+                operator = "*"
+            elif self.tokens[self.currentToken].get_word() == "/":
+                operator = "/"
+
             self.incrementToken()
+
             self.RULE_B()
 
+            # Semantic
+            x = SemanticAnalyzer.popStack()
+            y = SemanticAnalyzer.popStack()
+            result = SemanticAnalyzer.calculate_cube(x, y, operator)
+            SemanticAnalyzer.pushStack(result)
+
+            # Code Generation
+            if operator == "+": CodeGenerator.addInstruction("OPR", "4", "0")
+            else: CodeGenerator.addInstruction("OPR", "5", "0")
+
     def RULE_B(self):
-        if self.tokens[self.currentToken].get_word() == "-": self.incrementToken()
+        # Semantic
+        operatorWasUsed = False
+
+        if self.tokens[self.currentToken].get_word() == "-" and self.isSameLine(): 
+            # Semantic
+            operatorWasUsed = True
+
+            # Code Generation
+            CodeGenerator.addInstruction("LIT", "0", "0")
+
+            self.incrementToken()
 
         self.RULE_C()
 
-    def RULE_C(self):
-        #Falat CodeGeneration
-        if self.tokens[self.currentToken].get_token() in {"INTEGER", "OCTAL", "HEX", "BINARY", "STRING", "CHAR", "FLOAT", "ID"}:
-            self.incrementToken()
-        elif self.tokens[self.currentToken].get_word() in {"true", "false"}:
-            self.incrementToken()
-        elif self.tokens[self.currentToken].get_word() == "(": 
-            self.incrementToken()
-            self.RULE_EXPRESSION()
+        if operatorWasUsed:
+            # Semantic
+            x = SemanticAnalyzer.popStack()
+            result = SemanticAnalyzer.calculate_cube(x, "-")
+            SemanticAnalyzer.pushStack(result)
 
-            if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
-            else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+            # Code Generation
+            CodeGenerator.addInstruction("OPR", "3", "0")
+
+    def RULE_C(self):
+        val = ""
+        id = ""
+
+        if self.isSameLine():
+            if self.tokens[self.currentToken].get_token() == "INTEGER":
+                # Semantic
+                SemanticAnalyzer.pushStack("int")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "OCTAL":
+                # Semantic
+                SemanticAnalyzer.pushStack("int")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "HEX":
+                # Semantic
+                SemanticAnalyzer.pushStack("int")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "BINARY":
+                # Semantic
+                SemanticAnalyzer.pushStack("int")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "CHAR":
+                # Semantic
+                SemanticAnalyzer.pushStack("char")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "STRING":
+                # Semantic
+                SemanticAnalyzer.pushStack("string")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "FLOAT":
+                # Semantic
+                SemanticAnalyzer.pushStack("float")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "ID":
+                # Semantic
+                SemanticAnalyzer.pushStack(SemanticAnalyzer.getIdType(self.tokens[self.currentToken].get_word(), self.tokens[self.currentToken].get_line()))
+
+                # Code Generation
+                id = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LOD", id, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_word() == "true":
+                # Semantic
+                SemanticAnalyzer.pushStack("boolean")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_word() == "false":
+                # Semantic
+                SemanticAnalyzer.pushStack("boolean")
+
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_word() == "(": 
+                self.incrementToken()
+
+                self.RULE_EXPRESSION()
+
+                if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
+                else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+            else: self.exitParser(10, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
         else: self.exitParser(10, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
 
     def isFirst(self, token, scope):
