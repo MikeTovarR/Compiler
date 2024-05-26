@@ -65,7 +65,7 @@ class SemanticAnalyzer:
         return SemanticAnalyzer.__symbolTable
 
     @classmethod
-    def CheckVariable(self, type, id):
+    def CheckVariable(self, type, id, lineNo):
         if not (id in SemanticAnalyzer.__symbolTable):
             v = []
             if type == "string": v.append(SymbolTableItem(type, "global", ""))
@@ -76,7 +76,7 @@ class SemanticAnalyzer:
             elif type == "boolean": v.append(SymbolTableItem(type, "global", "false"))
             SemanticAnalyzer.__symbolTable[id] = v
         else:
-            print("error(1): variable id is already defined")
+            SemanticAnalyzer.error(1, lineNo, id)
             # error(1): "variable id is already defined"
 
     @classmethod
@@ -172,7 +172,7 @@ class SemanticAnalyzer:
             print(f"Line {n}:[Semantic] incompatible types: expected integer / octal / hexadecimal / binary")
 
     @classmethod
-    def get_id_type(Id, line_no):
+    def getIdType(Id, line_no):
         temp = SemanticAnalyzer.__symbolTable.get(Id)
         if temp is None:
             SemanticAnalyzer.error(0, line_no, Id)

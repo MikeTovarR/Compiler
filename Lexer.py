@@ -119,6 +119,10 @@ class Lexer:
         elif self.is_space(current_char):
             index += 1
         elif self.is_operator(current_char) or current_char in ('+', '-'):
+            if index+1 < len(line):
+                if (current_char == "=" or current_char == "!") and line[index+1] == "=":
+                    current_char += line[index+1]
+                    index += 1
             self.tokens.append(Token(current_char, "OPERATOR", row))
             index += 1
         else:

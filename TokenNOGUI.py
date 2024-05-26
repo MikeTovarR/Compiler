@@ -19,7 +19,7 @@ class TokenNOGUI:
             self.display_tokens(tokens)
             # PARSER
             parser = UParser(tokens) # Incluí el parser aquí
-            parser.RULE_PROGRAM()
+            parser.run()
         else:
             print("File Not Found")
 
