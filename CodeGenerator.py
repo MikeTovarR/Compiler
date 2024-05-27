@@ -27,6 +27,8 @@ class CodeGenerator:
 
     @staticmethod
     def writeCodeOnTxt(out_file):
+        with open(out_file, 'w'):
+            pass  # Al abrir el archivo en modo 'w', se vacía automáticamente
         with open(out_file, 'a') as file:
             for variable in CodeGenerator.__variables:
                 file.write(variable + '\n')
