@@ -1,0 +1,36 @@
+x, int, global, null
+y, int, global, null
+#1, int, 12
+#0, int, 14
+#2, int, 14
+#3, int, 23
+#4, int, 28
+@
+LIT 5, 0
+STO x, 0
+LIT "hola", 0
+OPR 21, 0
+LOD x, 0
+LIT 5, 0
+OPR 15, 0
+JMC #1, false
+LIT 1, 0
+STO y, 0
+JMP #0, 0
+LIT 2, 0
+STO y, 0
+LOD x, 0
+LIT 10, 0
+OPR 12, 0
+JMC #3, false
+LOD x, 0
+LIT 2, 0
+OPR 5, 0
+STO x, 0
+JMP #2, 0
+LOD y, 0
+LIT 1, 0
+OPR 15, 0
+JMC #4, false
+OPR 1, 0
+OPR 0, 0

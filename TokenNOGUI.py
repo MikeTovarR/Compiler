@@ -3,9 +3,9 @@ from Lexer import Lexer
 from UParser import UParser
 
 class TokenNOGUI:
-    def __init__(self, file_location):
+    def __init__(self, file_location, out_file):
         self.file_location = file_location
-
+        self.out_file = out_file
         self.analyze_file()
 
     def analyze_file(self):
@@ -19,7 +19,8 @@ class TokenNOGUI:
             self.display_tokens(tokens)
             # PARSER
             parser = UParser(tokens) # Incluí el parser aquí
-            parser.run()
+            parser.run(self.out_file)
+
         else:
             print("File Not Found")
 

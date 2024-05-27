@@ -5,9 +5,10 @@ from TokenNOGUI import TokenNOGUI
 def main():
 
     file_location = "test.txt" 
+    out_file = "resultCode.txt"
 
     # No GUI version
-    TokenNOGUI(file_location)
+    TokenNOGUI(file_location, out_file)
 
     # GUI version
     #root = tkinter.Tk()

@@ -84,11 +84,12 @@ class UParser:
 
         if isIncremented: self.incrementToken()
 
-    def run(self):
+    def run(self, out_file):
         SemanticAnalyzer.clear_all()
         CodeGenerator.clear()
         self.RULE_PROGRAM()
         CodeGenerator.writeCode()
+        CodeGenerator.writeCodeOnTxt(out_file)
 
     def RULE_PROGRAM(self):
         self.progEnd += 1
