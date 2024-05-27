@@ -60,12 +60,12 @@ class SemanticAnalyzer:
                 ["error", "error", "error", "error", "error", "error", "error"]],
                [["error", "error", "error", "error", "boolean", "error", "error"]]]
     
-    @classmethod
-    def getSymbolTable(self):
+    @staticmethod
+    def getSymbolTable():
         return SemanticAnalyzer.__symbolTable
 
-    @classmethod
-    def CheckVariable(self, type, id, lineNo):
+    @staticmethod
+    def CheckVariable(type, id, lineNo):
         if not (id in SemanticAnalyzer.__symbolTable):
             v = []
             if type == "string": v.append(SymbolTableItem(type, "global", ""))
@@ -79,20 +79,20 @@ class SemanticAnalyzer:
             SemanticAnalyzer.error(1, lineNo, id)
             # error(1): "variable id is already defined"
 
-    @classmethod
-    def pushStack(self, type):
+    @staticmethod
+    def pushStack(type):
 		# push type in the stack
         SemanticAnalyzer.__stack.append(type);
 
-    @classmethod
-    def popStack(self):
+    @staticmethod
+    def popStack():
         result = ""
 		# pop a value from the stack
         if SemanticAnalyzer.__stack:
             result = str(SemanticAnalyzer.__stack.pop())
         return result
     
-    @classmethod
+    @staticmethod
     def calculate_cube(type, operator):
         Dim1 = 2
         Dim3 = 6
@@ -119,7 +119,7 @@ class SemanticAnalyzer:
         result = SemanticAnalyzer.__cube[Dim1][Dim2][Dim3]
         return result
     
-    @classmethod
+    @staticmethod
     def calculate_cube(type1, type2, operator):
         Dim1 = 2
         Dim2 = 6
@@ -136,10 +136,10 @@ class SemanticAnalyzer:
         }
 
         if type1 in type_dict:
-            Dim2 = type_dict[type]
+            Dim2 = type_dict[type1]
 
         if type2 in type_dict:
-            Dim3 = type_dict[type]
+            Dim3 = type_dict[type2]
 
         if operator == "-" or operator == "*" or operator == "/":
             Dim1 = SemanticAnalyzer.__OP_MIN_MUL_DIV
@@ -158,7 +158,7 @@ class SemanticAnalyzer:
         result = SemanticAnalyzer.__cube[Dim1][Dim2][Dim3]
         return result
     
-    @classmethod
+    @staticmethod
     def error(err, n, info):
         if err == 0:
             print(f"Line {n}:[Semantic] variable <{info}> not found")
@@ -171,15 +171,15 @@ class SemanticAnalyzer:
         elif err == 4:
             print(f"Line {n}:[Semantic] incompatible types: expected integer / octal / hexadecimal / binary")
 
-    @classmethod
+    @staticmethod
     def getIdType(Id, line_no):
         temp = SemanticAnalyzer.__symbolTable.get(Id)
         if temp is None:
             SemanticAnalyzer.error(0, line_no, Id)
             return "error"
-        return temp[0].get_type()
+        return temp[0].getType()
     
-    @classmethod
+    @staticmethod
     def clear_all():
         SemanticAnalyzer.getSymbolTable().clear()
         while SemanticAnalyzer.__stack:

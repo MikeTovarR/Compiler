@@ -32,13 +32,15 @@ class UParser:
         self.FIRST["Y"] = {"!"}.union(self.FIRST["R"])
         self.FIRST["X"] = self.FIRST["Y"]
         self.FIRST["EXPRESSION"] = self.FIRST["X"]
+        self.FIRST["CASES"] = {"case"}
+        self.FIRST["DEFAULT"] = {"default"}
 
         self.FOLLOW["PROGRAM"] = {"EOF"}
         self.FOLLOW["PRINT"] = {";"}
         self.FOLLOW["ASSIGMENT"] = {";"}
         self.FOLLOW["VARIABLE"] = {";"}
         self.FOLLOW["RETURN"] = {";"}
-        self.FOLLOW["BODY"] = {";"}
+        self.FOLLOW["BODY"] = {"}"}
         self.FOLLOW["WHILE"] = {"}"}.union(self.FIRST["BODY"])
         self.FOLLOW["IF"] = {"}"}.union(self.FIRST["BODY"])
         self.FOLLOW["RETURN"] = {"}"}.union(self.FIRST["BODY"])
@@ -50,6 +52,7 @@ class UParser:
         self.FOLLOW["A"] =  {"-", "+"}.union(self.FOLLOW["E"])
         self.FOLLOW["B"] = {"*", "/"}.union(self.FOLLOW["A"])
         self.FOLLOW["C"] = self.FOLLOW["B"]
+        self.FOLLOW["SWITCH"] = self.FOLLOW["BODY"]
 
     def incrementToken(self):
         # print(f"{self.currentToken}, {len(self.tokens)}")
@@ -61,8 +64,7 @@ class UParser:
         print(f"ERROR {error}")
         if error == 1: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected {")
         elif error == 2: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected }")
-        elif error == 3: 
-            print("Line  "+str(line)+": invalid \""+str(word)+"\" expected ;")
+        elif error == 3: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected ;")
         elif error == 4: 
             print("Line  "+str(line)+": invalid \""+str(word)+"\" expected IDENTIFIER or KEYWORD")
             isIncremented = True
@@ -77,6 +79,8 @@ class UParser:
         elif error == 11: 
             print("Line  "+str(line)+": invalid \""+str(word)+"\" expected IDENTIFIER")
             isIncremented = True
+        elif error == 12: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected case")
+        elif error == 13: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected :")
 
         if isIncremented: self.incrementToken()
 
@@ -84,14 +88,7 @@ class UParser:
         SemanticAnalyzer.clear_all()
         CodeGenerator.clear()
         self.RULE_PROGRAM()
-        CodeGenerator.writeCode();
-
-    def RULE_PRINCIPAL(self):
-        self.progEnd += 1
-        if self.tokens[self.currentToken].get_word() == "int" or self.tokens[self.currentToken].get_word() == "float" or self.tokens[self.currentToken].get_word() == "bool" or self.tokens[self.currentToken].get_word() == "char" or self.tokens[self.currentToken].get_word() == "string" or self.tokens[self.currentToken].get_word() == "void":
-            self.RULE_VARIABLE()
-            if self.tokens[self.currentToken].get_word() == ";": self.incrementToken()
-            else: self.exitParser(3, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+        CodeGenerator.writeCode()
 
     def RULE_PROGRAM(self):
         self.progEnd += 1
@@ -232,14 +229,14 @@ class UParser:
         CodeGenerator.addVariable(type, id)
 
         # Declaration and assigment
-        if self.tokens[self.currentToken].get_word() == "=": 
+        if self.tokens[self.currentToken+1].get_word() == "=": 
             self.RULE_ASSIGMENT()
         else: self.incrementToken()
-            
+
     def RULE_WHILE(self):
-        e1 = "" + self.labelCount
+        e1 = str(self.labelCount)
         self.labelCount += 1
-        e2 = "" + self.labelCount
+        e2 = str(self.labelCount)
         self.labelCount += 1
 
         self.incrementToken()
@@ -294,10 +291,139 @@ class UParser:
         if self.tokens[self.currentToken].get_word() == ")": self.incrementToken()
         else: self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
     
-    # Incompleta
     def RULE_SWITCH(self):
+        end = str(self.labelCount)
+        self.labelCount += 1
+        id = ""
+
         self.incrementToken()
-        #Por implementar
+        
+        if self.tokens[self.currentToken].get_word() == "(" and self.isSameLine(): self.incrementToken()
+        else: 
+            self.exitParser(7, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+            while (not (self.isFirst("CASES") or ((self.tokens[self.currentToken].get_token() == "ID") or 
+                    (self.tokens[self.currentToken].get_word() == ")") and self.isSameLine()) or
+                    (self.tokens[self.currentToken].get_word() == "{"))):
+                self.incrementToken()
+
+        if self.tokens[self.currentToken].get_token() == "ID":
+            if SemanticAnalyzer.getIdType(self.tokens[self.currentToken].get_word(), self.tokens[self.currentToken].get_line()) == "int":
+                # Code Generation
+                id = self.tokens[self.currentToken].get_word()
+                self.incrementToken()
+            else:
+                SemanticAnalyzer.error(4, self.tokens[self.currentToken-1].get_line(), "")
+                self.incrementToken()
+        else: 
+            self.exitParser(6, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+            while not (self.isFirst("CASES") or (self.tokens[self.currentToken].get_word() == "{") or
+                    ((self.tokens[self.currentToken].get_word() == ")") and self.isSameLine())):
+                self.incrementToken()
+
+        if self.tokens[self.currentToken].get_word() == ")" and self.isSameLine(): self.incrementToken()
+        else:
+            self.exitParser(8, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+            while self.isSameLine() and not (self.isFirst("CASES") or (self.tokens[self.currentToken].get_word() == "{")):
+                self.incrementToken()
+        
+        if self.tokens[self.currentToken].get_word() == "{": self.incrementToken()
+        else:
+            self.exitParser(1, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+
+            while self.isSameLine() and not (self.isFirst("CASES") or self.isFirst("DEFAULT") or (self.tokens[self.currentToken].get_word() == "}")):
+                self.incrementToken()
+
+        self.RULE_CASES(id, end)
+
+        if self.tokens[self.currentToken].get_word() == "default":
+            self.RULE_DEFAULT()
+
+        if self.tokens[self.currentToken].get_word() == "}": self.incrementToken()
+        else: self.exitParser(2, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+
+        # Code Generation
+        CodeGenerator.addLabel(end, CodeGenerator.getInstructionCount() + 1)
+
+    def RULE_CASES(self, id, end):
+        val = ""
+        while True:
+            e1 = str(self.labelCount)
+            self.labelCount += 1
+            
+            if self.tokens[self.currentToken].get_word() == "case":
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LOD", id, "0")
+                
+                self.incrementToken()
+            else:
+                self.newLineErr = True
+                self.exitParser(12, self.tokens[self.currentToken].get_line(), self.tokens[self.currentToken].get_word())
+            
+            if self.tokens[self.currentToken].get_token() == "INTEGER":
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+                
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "OCTAL":
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+                
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "BINARY":
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+                
+                self.incrementToken()
+            elif self.tokens[self.currentToken].get_token() == "HEXADECIMAL":
+                # Code Generation
+                val = self.tokens[self.currentToken].get_word()
+                CodeGenerator.addInstruction("LIT", val, "0")
+                
+                self.incrementToken()
+            else:
+                SemanticAnalyzer.error(4, self.tokens[self.currentToken - 1].get_line(), "")
+                while not (self.isFirst("PROGRAM") or (self.tokens[self.currentToken].get_word() == ":" and self.isSameLine()) or 
+                    self.tokens[self.currentToken].get_word() == "}"):
+                    self.incrementToken()
+
+            if self.tokens[self.currentToken].get_word() == ":" and self.isSameLine():
+                self.incrementToken()
+            else:
+                self.exitParser(13, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+                while self.isSameLine() and not (self.isFirst("PROGRAM") or self.tokens[self.currentToken].get_word() == "}" or 
+                    self.tokens[self.currentToken].get_word() == ":"):
+                    self.incrementToken()
+
+            # Code Generation
+            CodeGenerator.addInstruction("OPR", "15", "0")
+            CodeGenerator.addInstruction("JMC", f"#{e1}", "false")
+            
+            self.RULE_PROGRAM()
+
+            # CodeGeneration
+            CodeGenerator.addInstruction("JMP", f"#{end}", "0")
+            CodeGenerator.addLabel(e1, CodeGenerator.getInstructionCount() + 1)
+
+            if self.tokens[self.currentToken].get_word() != "case":
+                break
+    
+    def RULE_DEFAULT(self):
+        if self.tokens[self.currentToken].get_word() == "default": self.incrementToken()
+
+        if self.tokens[self.currentToken].get_word() == ":" and self.isSameLine(): self.incrementToken()
+        else:
+            self.exitParser(13, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+            while self.isSameLine() and not (self.isFirst("PROGRAM") or self.tokens[self.currentToken].get_word() == "}"):
+                self.incrementToken()
+
+        self.RULE_PROGRAM()
 
     # Por incluir
     def RULE_FOR(self):
@@ -336,9 +462,9 @@ class UParser:
         self.RULE_E()
 
     def RULE_IF(self):
-        e1 = "" + self.labelCount
+        e1 = str(self.labelCount)
         self.labelCount += 1
-        e2 = "" + self.labelCount
+        e2 = str(self.labelCount)
         self.labelCount += 1
 
         self.incrementToken()
@@ -369,15 +495,15 @@ class UParser:
 
         if self.tokens[self.currentToken].get_word() == "else": 
             # Code Generation
-            CodeGenerator.addLabel(e1, CodeGenerator.getInstructionCount + 2)
+            CodeGenerator.addLabel(e1, CodeGenerator.getInstructionCount() + 2)
             CodeGenerator.addInstruction("JMP", "#" + e2, "0")
 
             self.incrementToken()
             self.RULE_PROGRAM()
 
             # Code Generation
-            CodeGenerator.addLabel(e2, CodeGenerator.getInstructionCount + 1)
-        else: CodeGenerator.addLabel(e1, CodeGenerator.getInstructionCount + 1)
+            CodeGenerator.addLabel(e2, CodeGenerator.getInstructionCount() + 1)
+        else: CodeGenerator.addLabel(e1, CodeGenerator.getInstructionCount() + 1)
 
     def RULE_RETURN(self):
         # Code Generation
@@ -480,13 +606,13 @@ class UParser:
         self.RULE_E()
 
         while self.isSameLine() and (self.tokens[self.currentToken].get_word() == "<" or self.tokens[self.currentToken].get_word() == ">" or self.tokens[self.currentToken].get_word() == "==" or self.tokens[self.currentToken].get_word() == "!="):
-            if self.tokens[self.currentToken+1].get_word() == ">":
+            if self.tokens[self.currentToken].get_word() == ">":
                 operator = ">"
-            elif self.tokens[self.currentToken+1].get_word() == "<":
+            elif self.tokens[self.currentToken].get_word() == "<":
                 operator = "<"
-            elif self.tokens[self.currentToken+1].get_word() == "==":
+            elif self.tokens[self.currentToken].get_word() == "==":
                 operator = "=="
-            elif self.tokens[self.currentToken+1].get_word() == "!=":
+            elif self.tokens[self.currentToken].get_word() == "!=":
                 operator = "!="
 
             self.incrementToken()

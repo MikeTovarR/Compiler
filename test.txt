@@ -1,5 +1,22 @@
 {
-int x
-int
-int int x;
+    int x = 5;
+    int y;
+    print("hola");
+
+    switch(x){
+        case 5: {
+            y = 1;
+        }
+        default:{
+            y = 2;
+        }
+    }
+
+    while(x < 10){
+        x = x*2;
+    }
+
+    if(y==1){
+        return;
+    }
 }

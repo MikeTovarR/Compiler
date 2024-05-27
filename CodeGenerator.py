@@ -3,20 +3,20 @@ class CodeGenerator:
     __labels = []
     __instructions = []
 
-    @classmethod
+    @staticmethod
     def addInstruction(instruction, p1, p2):
-        CodeGenerator.__instructions.append(instruction + " " + p1 + ", " + p2)
+        CodeGenerator.__instructions.append(f"{instruction} {p1}, {p2}")
     
-    @classmethod
+    @staticmethod
     def addLabel(name, value):
-        CodeGenerator.__labels.append("#" + name + ", int, " + value)
+        CodeGenerator.__labels.append(f"#{name}, int, {value}")
 
-    @classmethod
+    @staticmethod
     def addVariable(type, name):
-        CodeGenerator.__variables.append(name + ", " + type + ", global, null")
+        CodeGenerator.__variables.append(f"{name}, {type}, global, null")
 
-    @classmethod
-    def writeCode(type, name):
+    @staticmethod
+    def writeCode():
         for variable in CodeGenerator.__variables:
             print(variable)
         for label in CodeGenerator.__labels:
@@ -25,12 +25,12 @@ class CodeGenerator:
         for inst in CodeGenerator.__instructions:
             print(inst)
     
-    @classmethod
+    @staticmethod
     def clear():
         CodeGenerator.__instructions = []
         CodeGenerator.__labels = []
         CodeGenerator.__variables = []
 
-    @classmethod
+    @staticmethod
     def getInstructionCount():
         return len(CodeGenerator.__instructions)
