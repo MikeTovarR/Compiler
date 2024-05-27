@@ -1,18 +1,28 @@
-y, int, global, null
-#0, int, 3
-#1, int, 14
+a, int, global, 0
+leer-int-int-string, int, function, 3
+i, int, leer-int-int-string, 0
+j, int, leer-int-int-string, 0
+txt, string, leer-int-int-string, 0
+main, void, function, 15
+y, int, main, 0
 @
-LIT 2, 0
-STO y, 0
-LOD y, 0
 LIT 5, 0
-OPR 12, 0
-JMC #1, false
-LOD y, 0
-LIT 2, 0
+STO a, 0
+STO txt, 0
+STO j, 0
+STO i, 0
+LOD a, 0
+LOD i, 0
 OPR 2, 0
-STO y, 0
-LIT "hola", 0
+LOD j, 0
+OPR 2, 0
+STO a, 0
+LOD txt, 0
 OPR 21, 0
-JMP #0, 0
+OPR 1, 0
+LOD y, 0
+LIT 3, 0
+OPR 4, 0
+STO y, 0
+OPR 1, 0
 OPR 0, 0

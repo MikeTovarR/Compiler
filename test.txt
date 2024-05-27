@@ -1,6 +1,11 @@
-{
+int a = 5;
+
+function int leer(int i, int j, string txt){
+    a = a + i + j;
+    print(txt);
+}
+
+function void main(){
     int y;
-    for(y=2;y<5;y=y+2){
-        print("hola");
-    }
+    y = y*3;
 }

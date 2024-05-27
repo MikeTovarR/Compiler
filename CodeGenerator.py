@@ -12,8 +12,8 @@ class CodeGenerator:
         CodeGenerator.__labels.append(f"#{name}, int, {value}")
 
     @staticmethod
-    def addVariable(type, name):
-        CodeGenerator.__variables.append(f"{name}, {type}, global, null")
+    def addVariable(type, name, scope, line):
+        CodeGenerator.__variables.append(f"{name}, {type}, {scope}, {line}")
 
     @staticmethod
     def writeCode():
