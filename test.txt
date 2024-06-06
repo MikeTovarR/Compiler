@@ -7,5 +7,5 @@ function int leer(int i, int j, string txt){
 
 function void main(){
     int y;
-    y = y*3;
+    y = y*leer(1,"holi");
 }

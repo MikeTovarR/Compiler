@@ -14,6 +14,7 @@ class UParser:
         self.labelCount = 0
         self.progEnd = 0
         self.endCode = False
+        self.itWorks = True
 
     # Incompleta
     def buildFandF(self):
@@ -64,6 +65,7 @@ class UParser:
             self.endCode = True
 
     def exitParser(self, error, line, word):
+        self.itWorks = False
         isIncremented = False
         print(f"ERROR {error}")
         if error == 1: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected {")
@@ -88,6 +90,7 @@ class UParser:
         elif error == 14: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected while")
         elif error == 15: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected TYPE")
         elif error == 16: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected ,")
+        elif error == 17: print("Line  "+str(line)+": the function "+str(word)+" doesn't exist or can not be referenced")
 
         if isIncremented: self.incrementToken()
 
@@ -95,8 +98,12 @@ class UParser:
         SemanticAnalyzer.clear_all()
         CodeGenerator.clear()
         self.RULE_PRINCIPAL()
-        CodeGenerator.writeCode()
-        CodeGenerator.writeCodeOnTxt(out_file)
+        if self.itWorks:
+            CodeGenerator.writeCode()
+            CodeGenerator.writeCodeOnTxt(out_file)
+            print("SUCCESSFULLY COMPILED")
+        else:
+            print("ERRORS WHILE COMPILING")
 
     def RULE_PRINCIPAL(self):
         while not self.endCode:
@@ -204,6 +211,7 @@ class UParser:
             result = SemanticAnalyzer.calculate_cube(x, y, "=")
             if (not result == "OK") and (not y == ""):
                 SemanticAnalyzer.error(2, self.tokens[self.currentToken-1].get_line(), "")
+                self.itWorks = False
             
             # Code Generation
             CodeGenerator.addInstruction("STO", id, "0");
@@ -291,8 +299,9 @@ class UParser:
         # Code Generation
         CodeGenerator.addVariable(type, name, "function", CodeGenerator.getInstructionCount() + 1)
 
-        if self.tokens[self.currentToken].get_word() == "int" or self.tokens[self.currentToken].get_word() == "float" or self.tokens[self.currentToken].get_word() == "bool" or self.tokens[self.currentToken].get_word() == "char" or self.tokens[self.currentToken].get_word() == "string" or self.tokens[self.currentToken].get_word() == "void":
-            params.append(self.RULE_VARIABLE(name))
+        if self.tokens[self.currentToken].get_word() != ")":
+            if self.tokens[self.currentToken].get_word() == "int" or self.tokens[self.currentToken].get_word() == "float" or self.tokens[self.currentToken].get_word() == "bool" or self.tokens[self.currentToken].get_word() == "char" or self.tokens[self.currentToken].get_word() == "string" or self.tokens[self.currentToken].get_word() == "void":
+                params.append(self.RULE_VARIABLE(name))
         while self.tokens[self.currentToken].get_word() != ")":  
             if self.tokens[self.currentToken].get_word() == "," and self.isSameLine(): self.incrementToken()
             else: self.exitParser(16, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
@@ -336,6 +345,7 @@ class UParser:
         x = SemanticAnalyzer.popStack()
         if not x == "boolean":
             SemanticAnalyzer.error(3, self.tokens[self.currentToken-1].get_line(), "")
+            self.itWorks = False
 
         # Code Generation
         CodeGenerator.addInstruction("JMC", "#" + e2, "false")
@@ -378,6 +388,7 @@ class UParser:
             x = SemanticAnalyzer.popStack()
             if not x == "boolean":
                 SemanticAnalyzer.error(3, self.tokens[self.currentToken-1].get_line(), "")
+                self.itWorks = False
 
             if self.tokens[self.currentToken].get_word() == ")" and self.isSameLine(): self.incrementToken()
             else: 
@@ -416,6 +427,7 @@ class UParser:
                 self.incrementToken()
             else:
                 SemanticAnalyzer.error(4, self.tokens[self.currentToken-1].get_line(), "")
+                self.itWorks = False
                 self.incrementToken()
         else: 
             self.exitParser(6, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
@@ -491,6 +503,7 @@ class UParser:
                 self.incrementToken()
             else:
                 SemanticAnalyzer.error(4, self.tokens[self.currentToken - 1].get_line(), "")
+                self.itWorks = False
                 while not (self.isFirst("PROGRAM") or (self.tokens[self.currentToken].get_word() == ":" and self.isSameLine()) or 
                     self.tokens[self.currentToken].get_word() == "}"):
                     self.incrementToken()
@@ -557,6 +570,7 @@ class UParser:
         x = SemanticAnalyzer.popStack()
         if not x == "boolean":
             SemanticAnalyzer.error(3, self.tokens[self.currentToken-1].get_line(), "")
+            self.itWorks = False
 
         # Code Generation
         CodeGenerator.addInstruction("JMC", "#" + e2, "false")
@@ -599,6 +613,7 @@ class UParser:
         x = SemanticAnalyzer.popStack()
         if not x == "boolean":
             SemanticAnalyzer.error(3, self.tokens[self.currentToken-1].get_line(), "")
+            self.itWorks = False
 
         # Code Generation
         CodeGenerator.addInstruction("JMC", "#" + e1, "false")
@@ -904,7 +919,6 @@ class UParser:
 
                     self.incrementToken()
                 else:
-                    # IMPLEMENTAR LLAMADA DE FUNCION
                     self.RULE_FUNCTION_CALL()
 
             elif self.tokens[self.currentToken].get_word() == "true":
@@ -937,7 +951,47 @@ class UParser:
 
     # FALTA IMPLEMENTAR LLAMADA DE FUNCION
     def RULE_FUNCTION_CALL(self):
-        pass
+        type = "void"
+
+        function_name = self.tokens[self.currentToken].get_word()
+
+        self.incrementToken()
+
+        if self.tokens[self.currentToken].get_word() == "(": self.incrementToken()
+        else: 
+            self.exitParser(7, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+            while self.isSameLine() and (not (self.isFirst(self.tokens[self.currentToken], "EXPRESSION") or self.tokens[self.currentToken].get_word() == ")")):
+                self.incrementToken()
+
+        if self.tokens[self.currentToken].get_word() != ")":
+            self.RULE_EXPRESSION()
+            # Semantic
+            function_name += "-" + str(SemanticAnalyzer.popStack())
+
+        while self.tokens[self.currentToken].get_word() != ")":  
+            if self.tokens[self.currentToken].get_word() == "," and self.isSameLine(): self.incrementToken()
+            else: self.exitParser(16, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
+
+            self.RULE_EXPRESSION()
+            # Semantic
+            function_name += "-" + str(SemanticAnalyzer.popStack())
+
+        for var in CodeGenerator.getVariables():
+            split_var = var.split(", ")
+            if function_name == split_var[0] and split_var[2] == "function":
+                type = split_var[1]
+                break
+
+        if type == "void":
+            self.exitParser(17, self.tokens[self.currentToken].get_line(), function_name)
+
+        # Semantic
+        SemanticAnalyzer.pushStack(type)
+            
+        # Code Generation  
+        CodeGenerator.addInstruction("JMP", function_name, "0")
+
+        self.incrementToken()
 
     def isFirst(self, token, scope):
         return (token.get_word() in self.FIRST[scope] or token.get_token() in self.FIRST[scope])

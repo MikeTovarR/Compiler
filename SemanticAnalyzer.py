@@ -94,6 +94,7 @@ class SemanticAnalyzer:
     
     @staticmethod
     def calculate_cube(type, operator):
+        result = ""
         Dim1 = 2
         Dim3 = 6
         Dim2 = 0  # Debido al operador unario
@@ -121,6 +122,7 @@ class SemanticAnalyzer:
     
     @staticmethod
     def calculate_cube(type1, type2, operator):
+        result = ""
         Dim1 = 2
         Dim2 = 6
         Dim3 = 6 

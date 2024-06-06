@@ -21,7 +21,10 @@ LOD txt, 0
 OPR 21, 0
 OPR 1, 0
 LOD y, 0
-LIT 3, 0
+LIT 1, 0
+LIT 2, 0
+LIT "holi", 0
+JMP leer-int-int-string, 0
 OPR 4, 0
 STO y, 0
 OPR 1, 0

@@ -47,3 +47,7 @@ class CodeGenerator:
     @staticmethod
     def getInstructionCount():
         return len(CodeGenerator.__instructions)
+    
+    @staticmethod
+    def getVariables():
+        return CodeGenerator.__variables
