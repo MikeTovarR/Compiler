@@ -53,6 +53,7 @@ class TokenGUI:
             lexer = Lexer(text)
             lexer.run()
             tokens = lexer.get_tokens()
+            self.display_tokens(tokens)
             # PARSER
             parser = UParser(tokens)
             parser.RULE_PROGRAM()

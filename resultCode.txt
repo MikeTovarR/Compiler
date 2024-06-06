@@ -1,0 +1,31 @@
+a, int, global, 0
+leer-int-int-string, int, function, 3
+i, int, leer-int-int-string, 0
+j, int, leer-int-int-string, 0
+txt, string, leer-int-int-string, 0
+main, void, function, 15
+y, int, main, 0
+@
+LIT 5, 0
+STO a, 0
+STO txt, 0
+STO j, 0
+STO i, 0
+LOD a, 0
+LOD i, 0
+OPR 2, 0
+LOD j, 0
+OPR 2, 0
+STO a, 0
+LOD txt, 0
+OPR 21, 0
+OPR 1, 0
+LOD y, 0
+LIT 1, 0
+LIT 2, 0
+LIT "holi", 0
+JMP leer-int-int-string, 0
+OPR 4, 0
+STO y, 0
+OPR 1, 0
+OPR 0, 0

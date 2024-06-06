@@ -1,0 +1,11 @@
+int a = 5;
+
+function int leer(int i, int j, string txt){
+    a = a + i + j;
+    print(txt);
+}
+
+function void main(){
+    int y;
+    y = y*leer(1,"holi");
+}
