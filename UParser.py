@@ -920,7 +920,6 @@ class UParser:
                     self.incrementToken()
                 else:
                     self.RULE_FUNCTION_CALL()
-
             elif self.tokens[self.currentToken].get_word() == "true":
                 # Semantic
                 SemanticAnalyzer.pushStack("boolean")
@@ -949,7 +948,6 @@ class UParser:
             else: self.exitParser(10, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
         else: self.exitParser(10, self.tokens[self.currentToken-1].get_line(), self.tokens[self.currentToken].get_word())
 
-    # FALTA IMPLEMENTAR LLAMADA DE FUNCION
     def RULE_FUNCTION_CALL(self):
         type = "void"
 
