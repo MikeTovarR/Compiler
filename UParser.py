@@ -90,7 +90,7 @@ class UParser:
         elif error == 14: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected while")
         elif error == 15: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected TYPE")
         elif error == 16: print("Line  "+str(line)+": invalid \""+str(word)+"\" expected ,")
-        elif error == 17: print("Line  "+str(line)+": the function "+str(word)+" doesn't exist or can not be referenced")
+        elif error == 17: print("Line  "+str(line)+": the function \""+str(word)+"\" doesn't exist or can not be referenced")
 
         if isIncremented: self.incrementToken()
 
@@ -950,8 +950,8 @@ class UParser:
 
     def RULE_FUNCTION_CALL(self):
         type = "void"
-
-        function_name = self.tokens[self.currentToken].get_word()
+        name = self.tokens[self.currentToken].get_word()
+        function_name = name
 
         self.incrementToken()
 
@@ -981,7 +981,7 @@ class UParser:
                 break
 
         if type == "void":
-            self.exitParser(17, self.tokens[self.currentToken].get_line(), function_name)
+            self.exitParser(17, self.tokens[self.currentToken].get_line(), name)
 
         # Semantic
         SemanticAnalyzer.pushStack(type)
